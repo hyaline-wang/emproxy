@@ -15,8 +15,8 @@ def welcome_page():
     console = Console()
 
     # 创建标题
-    title = Text("网络转发工具V1.0", style="bold magenta", justify="center")
-    subtitle = Text("这个工具用于帮助无人机从其他设备上获取互联网连接", style="italic white", justify="center")
+    title = Text("emNavi网络共享工具V1.0", style="bold magenta", justify="center")
+    subtitle = Text("帮助无人机从其他设备上获取互联网连接", style="italic white", justify="center")
 
     # 创建一个面板以美化显示
     panel = Panel(
@@ -31,15 +31,16 @@ def welcome_page():
     console.print(panel)
     console.print(subtitle)
 
-    console.print("\n[bold yellow]常用于以下场景:[/bold yellow]")
-    console.print("1. usb直连模式")
-    console.print("2. 无人机为AP模式")
+    console.print("\n[bold yellow]可用于以下场景:[/bold yellow]")
+    console.print("1. usb直连至Host设备，Host设备可以访问互联网")
+    console.print("2. 无人机为AP模式，Host设备连接至无人机的wifi，Host设备可以访问互联网")
     console.print("3. 无人机为STA模式，但是路由器无法连接互联网，有其他电脑可以通过有线或者无线连接到互联网")
 
     # 额外信息
     console.print("\n[bold yellow]你需要:[/bold yellow]")
     console.print("1. 保证无人机和此设备在同一个局域网内")
     console.print("2. 保证此设备能够访问互联网")
+    console.print("3. 与emNavi控制台配合使用")
     console.print("\n[bold cyan]按Enter键继续...[/bold cyan]")
     input()  # 等待用户按回车键
 
@@ -77,7 +78,7 @@ def display_info(ip_list):
 
     # 添加数据（这里你可以替换为实际的数据）
     for i,ip_dict in enumerate(ip_list):
-        table.add_row(str(i+1), ip_list[i]['interface'], ip_list[i]['IPv4'])
+        table.add_row(str(i), ip_list[i]['interface'], ip_list[i]['IPv4'])
     # table.add_row("eth0", "192.168.1.10", "fe80::1")
     # table.add_row("lo", "127.0.0.1", "::1")
 
@@ -105,23 +106,21 @@ def get_ip_addresses():
         ip_list.append(ip_dict)
     return ip_list
 
+import sys
 if __name__ == '__main__':
     welcome_page()
     ip_dicts = get_ip_addresses()
     display_info(ip_dicts)    
     choice = Prompt.ask("选择你希望实现转发的网卡，默认为全部", choices=[str(i) for i in range(0, len(ip_dicts) + 1)])
-    if choice == '0':
-        print("转发来自: ALL 的数据包")
-    else:
-        print(f"转发来自: {choice}:{ip_dicts[int(choice)]['interface']} {ip_dicts[int(choice)]['IPv4']} 的数据包")
+    print(f"转发来自: {choice}   {ip_dicts[int(choice)]['interface']} {ip_dicts[int(choice)]['IPv4']} 的数据包")
+    print("############################################")
     # 创建代理服务器
-    proxy = Proxy(
-        hostname=ip_dicts[int(choice)]['IPv4'],  # 代理服务器地址
-        port=8899,              # 代理服务器端口
-        verbose=False            # 显示详细信息
-    )
-    try:
+    # args = sys.argv
+    arg = [ '--hostname', ip_dicts[int(choice)]['IPv4'], '--port', '8899']
+    # print(arg)
+    with Proxy(arg) as p:
         while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        pass  
+            try:
+                time.sleep(0.5)
+            except KeyboardInterrupt:
+                break
