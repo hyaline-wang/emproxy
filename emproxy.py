@@ -15,7 +15,7 @@ def welcome_page():
     console = Console()
 
     # 创建标题
-    title = Text("欢迎使用网络转发小工具", style="bold magenta", justify="center")
+    title = Text("网络转发工具V1.0", style="bold magenta", justify="center")
     subtitle = Text("这个工具用于帮助无人机从其他设备上获取互联网连接", style="italic white", justify="center")
 
     # 创建一个面板以美化显示
@@ -105,19 +105,6 @@ def get_ip_addresses():
         ip_list.append(ip_dict)
     return ip_list
 
-def main():
-    # 创建代理服务器
-    proxy = Proxy(
-        hostname='127.0.0.1',  # 代理服务器地址
-        port=8899,              # 代理服务器端口
-        verbose=False            # 显示详细信息
-    )
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        pass  
-
 if __name__ == '__main__':
     welcome_page()
     ip_dicts = get_ip_addresses()
@@ -126,5 +113,15 @@ if __name__ == '__main__':
     if choice == '0':
         print("转发来自: ALL 的数据包")
     else:
-        print(f"转发来自: {choice}:{ip_dicts[int(choice)]['interface']} 的数据包")
-    main()
+        print(f"转发来自: {choice}:{ip_dicts[int(choice)]['interface']} {ip_dicts[int(choice)]['IPv4']} 的数据包")
+    # 创建代理服务器
+    proxy = Proxy(
+        hostname=ip_dicts[int(choice)]['IPv4'],  # 代理服务器地址
+        port=8899,              # 代理服务器端口
+        verbose=False            # 显示详细信息
+    )
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        pass  
