@@ -111,7 +111,7 @@ if __name__ == '__main__':
     welcome_page()
     ip_dicts = get_ip_addresses()
     display_info(ip_dicts)    
-    choice = Prompt.ask("选择你希望实现转发的网卡，默认为全部", choices=[str(i) for i in range(0, len(ip_dicts) + 1)])
+    choice = Prompt.ask("选择你希望实现转发的网卡，默认为全部", choices=[str(i) for i in range(0, len(ip_dicts))])
     print(f"转发来自: {choice}   {ip_dicts[int(choice)]['interface']} {ip_dicts[int(choice)]['IPv4']} 的数据包")
     print("############################################")
     # 创建代理服务器
